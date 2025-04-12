@@ -141,10 +141,9 @@ def main(args):
     ref_protein = protein_from_pdb_file(args.ref_path) if args.ref_path else None
 
     # Generate samples
-    trainer = pl.Trainer.from_argparse_args(
-        args,
-        accelerator="auto",
-        devices = args.num_gpus, # update syntax
+    trainer = pl.Trainer( # update syntax for compatibility with pytorch_lightning 2.x
+        accelerator="auto", # Automatically chooses the accelerator (CPU, GPU, MPS, etc.)
+        devices = args.num_gpus, # The number of GPUs to use (or set to None for automatic selection)
         default_root_dir=args.output_dir,
         max_epochs=-1,
     )

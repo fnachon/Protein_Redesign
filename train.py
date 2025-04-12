@@ -27,36 +27,42 @@ def main(args):
     pl.seed_everything(args.seed, workers=True)
     if os.path.exists(args.save_dir):
         rmtree(args.save_dir)
-    args.save_dir.mkdir(parents=True)
+    args.save_dir.mkdir(parents=True, exist_ok=True)
 
     datamodule = PDBDataModule.from_argparse_args(args)
     model = ProteinReDiffModel(args)
-    trainer = pl.Trainer.from_argparse_args(
-        args,
-        accelerator="auto",
-        precision=16,
-        strategy="ddp_find_unused_parameters_false",
-        callbacks=[
-            ModelCheckpoint(
-                filename="{epoch:03d}-{val_loss:.2f}",
-                monitor="val_loss",
-                save_top_k=3,
-                save_last=True,
-            )
-        ],
-        default_root_dir=args.save_dir,
-        max_epochs=-1,
+
+    checkpoint_callback = ModelCheckpoint(
+        filename="{epoch:03d}-{val_loss:.2f}",
+        monitor="val_loss",
+        save_top_k=3,
+        save_last=True,
     )
-    trainer.fit(model, datamodule=datamodule)
+
+    trainer = pl.Trainer(
+        accelerator=args.accelerator,
+        devices=args.devices,
+        precision=args.precision,
+        strategy=args.strategy,
+        callbacks=[checkpoint_callback],
+        default_root_dir=args.save_dir,
+        max_epochs=args.max_epochs,
+    )
+    trainer.fit(model, datamodule=datamodule, ckpt_path=None)
 
 
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser = PDBDataModule.add_argparse_args(parser)
     parser = ProteinReDiffModel.add_argparse_args(parser)
-    parser = pl.Trainer.add_argparse_args(parser)
+    # Trainer args (explicitly added for Lightning 2.x compatibility)
+    parser.add_argument("--accelerator", type=str, default="auto")
+    parser.add_argument("--devices", type=int, default=1)
+    parser.add_argument("--precision", type=int, default=16)
+    parser.add_argument("--strategy", type=str, default="ddp_find_unused_parameters_false")
+    parser.add_argument("--max_epochs", type=int, default=-1)
+    # Custom script args
     parser.add_argument("--seed", type=int, default=1234)
-    parser.add_argument("--num_gpus", type = int, default = 1)
     parser.add_argument("--save_dir", type=Path, required=True)
     args = parser.parse_args()
 
