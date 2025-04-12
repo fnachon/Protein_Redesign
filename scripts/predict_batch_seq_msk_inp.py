@@ -66,7 +66,7 @@ def compute_residue_esm(protein: Protein, accelerator: str) -> torch.Tensor:
             [RESIDUE_TYPES_MASK[aa] for aa in protein.aatype[protein.chain_index == chain]]
         )
         data.append(("", sequence))
-    # batch_tokens = esm_batch_converter(data)[2].cuda()
+    # batch_tokens = esm_batch_converter(data)[2].cuda() or esm_batch_converter(data)[2].to("mps")
     if accelerator == "gpu":
         if torch.cuda.is_available():
             batch_tokens = esm_batch_converter(data)[2].cuda()
