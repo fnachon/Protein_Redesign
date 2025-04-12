@@ -107,7 +107,7 @@ def main(args):
 
     # Model
     model = ProteinReDiffModel.load_from_checkpoint(
-        args.ckpt_path, num_steps=args.num_steps, weights_only=True # syntax for pytorch 2.6
+        args.ckpt_path, num_steps=args.num_steps
     )
     
     model.training_mode = False

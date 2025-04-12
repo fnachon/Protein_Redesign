@@ -38,7 +38,7 @@ def run_tmalign(
             output = subprocess.check_output(cmd).decode()
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"TMalign failed: {e}")
-        line = output.splitlines()[17] # correct line for TMScore
+        line = output.splitlines()[1]
         tmscore = float(line.split()[3])  # TM2
         t, R = np.empty((3,)), np.empty((3, 3))
         with open(matrix_path, "r") as f:
