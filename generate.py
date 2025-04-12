@@ -152,6 +152,7 @@ def main(args):
         dataloaders=DataLoader(
             RepeatDataset(data, args.num_samples),
             batch_size=args.batch_size,
+            persistent_workers=True,
             num_workers=args.num_workers,
             collate_fn=collate_fn,
         ),
