@@ -41,7 +41,10 @@ def compute_residue_esm(protein: Protein) -> torch.Tensor:
     esm_model, esm_alphabet = torch.hub.load(
         "facebookresearch/esm:main", "esm2_t33_650M_UR50D"
     )
-    esm_model.cuda().eval()
+    if torch.backends.mps.is_available():
+        esm_model.to("mps").eval()
+    elif torch.cuda.is_available():
+        esm_model.cuda().eval()
     esm_batch_converter = esm_alphabet.get_batch_converter()
 
     data = []
@@ -50,7 +53,10 @@ def compute_residue_esm(protein: Protein) -> torch.Tensor:
             [RESIDUE_TYPES_MASK[aa] for aa in protein.aatype[protein.chain_index == chain]]
         )
         data.append(("", sequence))
-    batch_tokens = esm_batch_converter(data)[2].cuda()
+    if torch.backends.mps.is_available():
+        batch_tokens = esm_batch_converter(data)[2].to("mps")
+    elif torch.cuda.is_available():
+        batch_tokens = esm_batch_converter(data)[2].cuda()
     with torch.inference_mode():
         results = esm_model(batch_tokens, repr_layers=[esm_model.num_layers])
     token_representations = results["representations"][esm_model.num_layers].cpu()
@@ -101,7 +107,7 @@ def main(args):
 
     # Model
     model = ProteinReDiffModel.load_from_checkpoint(
-        args.ckpt_path, num_steps=args.num_steps
+        args.ckpt_path, num_steps=args.num_steps, weights_only=True # syntax for pytorch 2.6
     )
     
     model.training_mode = False

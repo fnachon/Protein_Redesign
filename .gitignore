@@ -2,3 +2,5 @@
 .DS_Store
 Complex-based Ligand-Binding Proteins Redesign by Equivariant Diffusion-based Generative Models 2024.04.17.589997v2.full.pdf
 /test
+/ProteinReDiff/__pycache__
+/ProteinReDiff/models/__pycache__
