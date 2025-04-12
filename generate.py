@@ -144,7 +144,7 @@ def main(args):
     trainer = pl.Trainer.from_argparse_args(
         args,
         accelerator="auto",
-        gpus = args.num_gpus,
+        devices = args.num_gpus, # update syntax
         default_root_dir=args.output_dir,
         max_epochs=-1,
     )
