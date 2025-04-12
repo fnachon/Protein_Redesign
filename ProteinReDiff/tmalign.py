@@ -28,7 +28,7 @@ def run_tmalign(
         ref_path = os.path.join(tmp_dir, "ref.pdb")
         protein_to_pdb_file(prb, prb_path)
         protein_to_pdb_file(ref, ref_path)
-        cmd = ["/scratch/midway3/ndn/TMalign", prb_path, ref_path]
+        cmd = ["TMalign", prb_path, ref_path] # TMalign executable installed with conda
         cmd += ["-outfmt", "2"]
         if mirror:
             cmd += ["-mirror", "1"]
@@ -38,7 +38,7 @@ def run_tmalign(
             output = subprocess.check_output(cmd).decode()
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"TMalign failed: {e}")
-        line = output.splitlines()[1]
+        line = output.splitlines()[17] # correct line for TMScore
         tmscore = float(line.split()[3])  # TM2
         t, R = np.empty((3,)), np.empty((3, 3))
         with open(matrix_path, "r") as f:
