@@ -2,7 +2,6 @@ name: ProteinReDiff
 channels:
   - conda-forge
   - bioconda
-  - pytorch
 dependencies:
   - tmalign
   - biopython==1.85
@@ -18,8 +17,10 @@ dependencies:
   - mypy==1.15.0
   - pdb-tools==2.5.0
   - pytest==8.3.5
-  - pytorch-lightning==2.5.1
+  - pytorch==2.5.1
+  - pytorch-lightning==1.9.0
+  - tensorboard==2.19.0
   - torch-ema==0.3
-  - wandb==0.19.8
+  - wandb==0.19.9
   - pip:
     - pysen==0.10.2
