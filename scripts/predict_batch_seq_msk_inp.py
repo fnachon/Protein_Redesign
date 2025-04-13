@@ -43,9 +43,12 @@ def load_esm_model(accelerator):
             "facebookresearch/esm:main", "esm2_t33_650M_UR50D"
         )
 
-        # esm_model.cuda().eval()
+        # move esm_model to gpu, either cuda or mps if available
         if accelerator == "gpu":
-            esm_model.cuda().eval()
+            if torch.cuda.is_available():
+                esm_model.cuda().eval()
+            elif torch.backends.mps.is_available():
+                esm_model.to("mps").eval()
         else:
             esm_model.eval()
         esm_batch_converter = esm_alphabet.get_batch_converter()
@@ -63,9 +66,12 @@ def compute_residue_esm(protein: Protein, accelerator: str) -> torch.Tensor:
             [RESIDUE_TYPES_MASK[aa] for aa in protein.aatype[protein.chain_index == chain]]
         )
         data.append(("", sequence))
-    # batch_tokens = esm_batch_converter(data)[2].cuda()
+    # batch_tokens = esm_batch_converter(data)[2].cuda() or esm_batch_converter(data)[2].to("mps")
     if accelerator == "gpu":
-        batch_tokens = esm_batch_converter(data)[2].cuda()
+        if torch.cuda.is_available():
+            batch_tokens = esm_batch_converter(data)[2].cuda()
+        elif torch.backends.mps.is_available():
+            batch_tokens = esm_batch_converter(data)[2].to("mps") # add mps support
     else:
         batch_tokens = esm_batch_converter(data)[2]
     with torch.inference_mode():

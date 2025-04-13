@@ -30,7 +30,7 @@ def main(args):
     output_dir = args.data_dir / "PDBBind_processed_cache"
     output_dir.mkdir(parents=True)
 
-    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    device = torch.device('mps' if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else 'cpu') # add mps awareness
     model, alphabet = torch.hub.load("facebookresearch/esm:main", "esm2_t33_650M_UR50D")
     model.to(device).eval()
     batch_converter = alphabet.get_batch_converter()

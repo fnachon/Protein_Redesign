@@ -28,7 +28,7 @@ def run_tmalign(
         ref_path = os.path.join(tmp_dir, "ref.pdb")
         protein_to_pdb_file(prb, prb_path)
         protein_to_pdb_file(ref, ref_path)
-        cmd = ["/scratch/midway3/ndn/TMalign", prb_path, ref_path]
+        cmd = ["TMalign", prb_path, ref_path] # TMalign executable installed with conda
         cmd += ["-outfmt", "2"]
         if mirror:
             cmd += ["-mirror", "1"]

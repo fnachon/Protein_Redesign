@@ -1,0 +1,27 @@
+name: ProteinReDiff
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - tmalign
+  - biopython==1.85
+  - black==25.1.0
+  - einops==0.8.1
+  - flake8==7.2.0
+  - gdown==5.2.0
+  - isort==6.0.1
+  - ipympl==0.9.7
+  - joblib==1.4.2
+  - jupyterlab==4.4.0
+  - meeko==0.5.0
+  - mypy==1.15.0
+  - pdb-tools==2.5.0
+  - pytest==8.3.5
+  - pytorch==2.6.0
+  - pytorch-lightning==2.5.1
+  - tensorboard==2.19.0
+  - torch-ema==0.3
+  - wandb==0.19.8
+  - pip
+  - pip:
+    - pysen==0.11.0

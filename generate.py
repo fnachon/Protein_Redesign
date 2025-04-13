@@ -41,7 +41,10 @@ def compute_residue_esm(protein: Protein) -> torch.Tensor:
     esm_model, esm_alphabet = torch.hub.load(
         "facebookresearch/esm:main", "esm2_t33_650M_UR50D"
     )
-    esm_model.cuda().eval()
+    if torch.backends.mps.is_available():
+        esm_model.to("mps").eval()
+    elif torch.cuda.is_available():
+        esm_model.cuda().eval()
     esm_batch_converter = esm_alphabet.get_batch_converter()
 
     data = []
@@ -50,7 +53,10 @@ def compute_residue_esm(protein: Protein) -> torch.Tensor:
             [RESIDUE_TYPES_MASK[aa] for aa in protein.aatype[protein.chain_index == chain]]
         )
         data.append(("", sequence))
-    batch_tokens = esm_batch_converter(data)[2].cuda()
+    if torch.backends.mps.is_available():
+        batch_tokens = esm_batch_converter(data)[2].to("mps")
+    elif torch.cuda.is_available():
+        batch_tokens = esm_batch_converter(data)[2].cuda()
     with torch.inference_mode():
         results = esm_model(batch_tokens, repr_layers=[esm_model.num_layers])
     token_representations = results["representations"][esm_model.num_layers].cpu()
@@ -135,10 +141,9 @@ def main(args):
     ref_protein = protein_from_pdb_file(args.ref_path) if args.ref_path else None
 
     # Generate samples
-    trainer = pl.Trainer.from_argparse_args(
-        args,
-        accelerator="auto",
-        gpus = args.num_gpus,
+    trainer = pl.Trainer( # update syntax for compatibility with pytorch_lightning 2.x
+        accelerator="auto", # Automatically chooses the accelerator (CPU, GPU, MPS, etc.)
+        devices = args.num_gpus, # The number of GPUs to use (or set to None for automatic selection)
         default_root_dir=args.output_dir,
         max_epochs=-1,
     )
@@ -147,6 +152,7 @@ def main(args):
         dataloaders=DataLoader(
             RepeatDataset(data, args.num_samples),
             batch_size=args.batch_size,
+            persistent_workers=True,
             num_workers=args.num_workers,
             collate_fn=collate_fn,
         ),

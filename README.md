@@ -50,6 +50,23 @@ chmod +x TMalign
 export PATH="/path/to/TMalign:$PATH"
 ```
 
+## For Mac users
+Clone this repository and install dependencies:
+```bash
+git clone https://github.com/fnachon/Protein_Redesign.git
+cd Protein_Redesign
+conda env create -f Mac_environment.yml
+conda activate ProteinReDiff
+```
+
+TMalign is installed by default in the conda environment.
+
+Download model parameters:
+```bash
+gdown --fuzzy --folder https://drive.google.com/drive/folders/1rPlzMUPgKLFd_Krk8cGqhEeitWByPOMn?usp=sharing
+```
+
+
 ## Sample generation
 
 Generate single complex structure using ProteinReDiff:
